@@ -3,10 +3,13 @@ import csv
 import os
 from datetime import datetime
 
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
 # 1. Muat kamus nama dari file names.txt
 names_dict = {}
-if os.path.exists("names.txt"):
-    with open("names.txt", "r") as f:
+names_path = os.path.join(BASE_DIR, "names.txt")
+if os.path.exists(names_path):
+    with open(names_path, "r") as f:
         for line in f:
             if "," in line:
                 key, value = line.strip().split(",")
@@ -14,11 +17,22 @@ if os.path.exists("names.txt"):
 
 # 2. Inisialisasi recognizer dan detektor wajah
 recognizer = cv2.face.LBPHFaceRecognizer_create()
-recognizer.read("training.yml")
-detector = cv2.CascadeClassifier("haarcascade_frontalface_default.xml")
+model_path = os.path.join(BASE_DIR, "training.yml")
+if not os.path.isfile(model_path):
+    raise FileNotFoundError(
+        f"Model training belum ada: {model_path}. "
+        "Jalankan 2_train.py dan pastikan training berhasil terlebih dahulu."
+    )
+recognizer.read(model_path)
+detector = cv2.CascadeClassifier(os.path.join(BASE_DIR, "haarcascade_frontalface_default.xml"))
+if detector.empty():
+    raise FileNotFoundError(
+        f"File cascade tidak ditemukan atau tidak dapat dibaca: "
+        f"{os.path.join(BASE_DIR, 'haarcascade_frontalface_default.xml')}"
+    )
 
 # 3. Siapkan file CSV untuk mencatat log deteksi (jika belum ada, buat file dan tulis header-nya)
-csv_file = "deteksi_log.csv"
+csv_file = os.path.join(BASE_DIR, "deteksi_log.csv")
 file_exists = os.path.exists(csv_file)
 
 with open(csv_file, mode="a", newline="") as f:

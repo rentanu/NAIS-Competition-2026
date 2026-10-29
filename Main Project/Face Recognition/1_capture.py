@@ -1,11 +1,15 @@
 import cv2
 import os
 
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+PROJECT_DIR = os.path.dirname(os.path.dirname(BASE_DIR))
+DATASET_DIR = os.path.join(PROJECT_DIR, "dataset")
+
 # 1. Masukkan nama subjek yang akan direkam
 nama = input("Masukkan nama Anda: ")
 
 # 2. Buat folder khusus untuk orang tersebut di dalam folder dataset
-path_folder = f"dataset/{nama}"
+path_folder = os.path.join(DATASET_DIR, nama)
 if not os.path.exists(path_folder):
     os.makedirs(path_folder)
     print(f"Folder untuk {nama} berhasil dibuat.")
@@ -31,7 +35,7 @@ while True:
     # Jika tombol 's' ditekan, simpan gambar ke folder
     if key == ord('s'):
         jumlah_gambar += 1
-        file_path = f"{path_folder}/img_{jumlah_gambar}.jpg"
+        file_path = os.path.join(path_folder, f"img_{jumlah_gambar}.jpg")
         cv2.imwrite(file_path, frame)
         print(f"[BERHASIL] Gambar {jumlah_gambar} tersimpan.")
 
